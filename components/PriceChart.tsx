@@ -86,13 +86,13 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
 
   const allValues = candles
     .flatMap((c) => [c.open, c.high, c.low, c.close])
-    .concat([predicted])
+    .concat([predicted, lower, upper])
     .filter((value) => Number.isFinite(value) && value > 0);
 
   const minValue = Math.min(...allValues);
   const maxValue = Math.max(...allValues);
   const valueRange = maxValue - minValue;
-  const padding = valueRange > 0 ? Math.max(valueRange * 0.001, 0.001) : 0.01;
+  const padding = valueRange > 0 ? valueRange * 0.05 : maxValue * 0.02;
 
   const minY = minValue - padding;
   const maxY = maxValue + padding;
@@ -119,6 +119,7 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
           />
           <YAxis
             domain={[minY, maxY]}
+            allowDataOverflow={true}
             tick={{ fill: "#94a3b8", fontSize: 10 }}
             tickFormatter={(v: number) => `${unit}${v.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
             width={70}
