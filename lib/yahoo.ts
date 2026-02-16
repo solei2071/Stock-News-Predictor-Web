@@ -19,16 +19,16 @@ export interface PriceData {
 
 export async function resolveSymbol(query: string): Promise<string> {
   const q = query.trim();
-  if (!q) throw new Error("종목명/티커를 입력해주세요.");
+  if (!q) throw new Error("Please enter a ticker or company name.");
 
   const url = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(q)}&quotesCount=10&newsCount=0&listsCount=0`;
   const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
-  if (!res.ok) throw new Error(`Yahoo 검색 실패: ${res.status}`);
+  if (!res.ok) throw new Error(`Yahoo search failed: ${res.status}`);
   const data = await res.json();
 
   const quotes = data?.quotes;
   if (!Array.isArray(quotes) || quotes.length === 0) {
-    throw new Error(`'${q}'에 해당하는 종목을 찾지 못했습니다.`);
+    throw new Error(`Could not find a symbol for '${q}'.`);
   }
 
   const isTickerLike = /^[A-Z]{1,6}$/.test(q.toUpperCase()) && !q.includes(" ");
@@ -68,7 +68,7 @@ export async function resolveSymbol(query: string): Promise<string> {
   }
 
   const symbol = best || quotes[0]?.symbol;
-  if (!symbol) throw new Error(`'${q}'에 해당하는 종목을 찾지 못했습니다.`);
+  if (!symbol) throw new Error(`Could not find a symbol for '${q}'.`);
   return symbol.toUpperCase();
 }
 
@@ -78,18 +78,18 @@ export async function fetchPriceData(
 ): Promise<PriceData> {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=${encodeURIComponent(period)}&includeAdjustedClose=true`;
   const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
-  if (!res.ok) throw new Error(`주가 데이터 가져오기 실패: ${res.status}`);
+  if (!res.ok) throw new Error(`Failed to fetch price data: ${res.status}`);
   const payload = await res.json();
 
   const results = payload?.chart?.result;
   if (!Array.isArray(results) || results.length === 0) {
-    throw new Error("주가 데이터가 없습니다.");
+    throw new Error("No price data returned.");
   }
 
   const result = results[0];
   const timestamps: number[] = result.timestamp || [];
   const indicators = result.indicators?.quote?.[0];
-  if (!indicators) throw new Error("가격 지표가 없습니다.");
+  if (!indicators) throw new Error("Price indicators are unavailable.");
 
   const closes: (number | null)[] = indicators.close || [];
   const opens: (number | null)[] = indicators.open || [];
@@ -112,7 +112,7 @@ export async function fetchPriceData(
     });
   }
 
-  if (rows.length === 0) throw new Error("유효한 가격 데이터가 없습니다.");
+  if (rows.length === 0) throw new Error("No valid price rows found.");
 
   const meta = result.meta || {};
   return {

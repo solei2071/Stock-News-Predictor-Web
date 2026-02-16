@@ -49,7 +49,7 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
   if (!candles || candles.length < 2) {
     return (
       <div className="bg-[#101a33] rounded-xl p-6 mb-6 h-[400px] flex items-center justify-center text-slate-500">
-        차트 데이터가 없습니다
+        No chart data
       </div>
     );
   }
@@ -71,7 +71,7 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
 
   const lastCandle = candles[candles.length - 1];
   chartData.push({
-    date: `예측(${horizon}일)`,
+    date: `Forecast (${horizon}d)`,
     open: lastCandle.close,
     high: upper,
     low: lower,
@@ -91,7 +91,7 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
   if (allValues.length === 0) {
     return (
       <div className="bg-[#101a33] rounded-xl p-6 mb-6 h-[400px] flex items-center justify-center text-slate-500">
-        유효한 차트 데이터가 없습니다
+        No valid chart data
       </div>
     );
   }
@@ -109,7 +109,7 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
   return (
     <div className="bg-[#101a33] rounded-xl p-4 mb-6">
       <h2 className="text-[#93c5fd] text-sm font-bold mb-3">
-        가격 트렌드 · 최근 {candles.length}거래일 + 예측 {horizon}영업일
+        Price trend · Last {candles.length} trading days + Forecast in {horizon} trading days
       </h2>
       <ResponsiveContainer width="100%" height={400}>
         <ComposedChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 0 }}>
@@ -118,7 +118,7 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
             dataKey="date"
             tick={{ fill: "#94a3b8", fontSize: 10 }}
             tickFormatter={(v: string) => {
-              if (v.startsWith("예측")) return v;
+              if (v.startsWith("Forecast")) return v;
               const parts = v.split("-");
               return parts.length >= 3 ? `${parts[1]}/${parts[2]}` : v;
             }}
@@ -143,11 +143,11 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
             formatter={((value: any, name: any) => {
               if (value == null) return ["-", name ?? ""];
               const labels: Record<string, string> = {
-                close: "종가",
-                open: "시가",
-                high: "고가",
-                low: "저가",
-                predicted: "예측가",
+                close: "Close",
+                open: "Open",
+                high: "High",
+                low: "Low",
+                predicted: "Forecast",
               };
               const n = String(name ?? "");
               return [`${unit}${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2 })}`, labels[n] || n];
@@ -182,7 +182,7 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
               stroke="#3b82f6"
               strokeDasharray="6 3"
               label={{
-                value: `예측: ${unit}${predicted.toFixed(2)}`,
+                value: `Forecast: ${unit}${predicted.toFixed(2)}`,
                 fill: "#93c5fd",
                 fontSize: 11,
                 position: "right",

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Stock News Predictor",
-  description: "뉴스 감성 분석 기반 주가 예측 서비스",
+  description: "Stock price forecast based on financial news sentiment.",
 };
 
 export default function RootLayout({
@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0b1220] text-slate-100 min-h-screen`}
       >

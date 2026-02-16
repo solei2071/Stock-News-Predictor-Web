@@ -37,7 +37,7 @@ export default function MetricCards({ data }: { data: AnalysisResult | null }) {
   if (!data) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-        {["현재가", "가격 추세", "뉴스 감성", "예측 수익률", "신뢰도", "예측 구간"].map((t) => (
+        {["Current Price", "Price Trend", "News Sentiment", "Projected Return", "Confidence", "Forecast Range"].map((t) => (
           <Card key={t} title={t} value="-" sub="-" />
         ))}
       </div>
@@ -49,35 +49,35 @@ export default function MetricCards({ data }: { data: AnalysisResult | null }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
       <Card
-        title="현재가"
+        title="Current Price"
         value={formatCurrency(data.currentPrice, data.currency)}
         sub={`${data.name} / ${data.exchange}`}
       />
       <Card
-        title="가격 추세"
+        title="Price Trend"
         value={`${data.trendPct >= 0 ? "+" : ""}${data.trendPct.toFixed(2)}%`}
-        sub={`최근 추세 (기반: ${data.horizon}일)`}
+        sub={`Recent trend (based on ${data.horizon} days)`}
         valueColor={pctColor(data.trendPct)}
       />
       <Card
-        title="뉴스 감성"
+        title="News Sentiment"
         value={`${data.sentiment >= 0 ? "+" : ""}${data.sentiment.toFixed(2)}`}
-        sub={`${data.sentimentLabel} · 뉴스 ${data.newsCount}건`}
+        sub={`${data.sentimentLabel} · ${data.newsCount} news items`}
         valueColor={pctColor(data.sentiment)}
       />
       <Card
-        title="예측 수익률"
+        title="Projected Return"
         value={`${data.finalPct >= 0 ? "+" : ""}${data.finalPct.toFixed(2)}%`}
-        sub={`신호: ${data.signal}`}
+        sub={`Signal: ${data.signal}`}
         valueColor={pctColor(data.finalPct)}
       />
       <Card
-        title="신뢰도"
+        title="Confidence"
         value={`${data.confidence.toFixed(0)}%`}
-        sub={data.newsCount > 0 ? "데이터 + 뉴스 반영" : "과거 데이터만 사용"}
+        sub={data.newsCount > 0 ? "Data + news included" : "Historical data only"}
       />
       <Card
-        title="예측 구간"
+        title="Forecast Range"
         value={formatCurrency(data.predicted, data.currency)}
         sub={`${formatCurrency(data.lower, data.currency)} ~ ${formatCurrency(data.upper, data.currency)}`}
       />

@@ -13,8 +13,8 @@ export default function NewsTable({ items }: { items: NewsItem[] }) {
   if (!items || items.length === 0) {
     return (
       <div className="bg-[#101a33] rounded-xl p-6">
-        <h2 className="text-[#93c5fd] text-sm font-bold mb-3">최신 뉴스</h2>
-        <p className="text-slate-500 text-sm">뉴스 데이터가 없습니다.</p>
+        <h2 className="text-[#93c5fd] text-sm font-bold mb-3">Latest news</h2>
+        <p className="text-slate-500 text-sm">No news data.</p>
       </div>
     );
   }
@@ -29,7 +29,7 @@ export default function NewsTable({ items }: { items: NewsItem[] }) {
     if (!d) return "-";
     try {
       const dt = new Date(d);
-      return dt.toLocaleDateString("ko-KR", {
+      return dt.toLocaleDateString("en-US", {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -43,15 +43,15 @@ export default function NewsTable({ items }: { items: NewsItem[] }) {
 
   return (
     <div className="bg-[#101a33] rounded-xl p-4">
-      <h2 className="text-[#93c5fd] text-sm font-bold mb-3">최신 뉴스</h2>
+      <h2 className="text-[#93c5fd] text-sm font-bold mb-3">Latest news</h2>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-slate-400 border-b border-slate-700">
-              <th className="text-left py-2 px-2 font-semibold w-40">시간</th>
-              <th className="text-left py-2 px-2 font-semibold w-24">출처</th>
-              <th className="text-center py-2 px-2 font-semibold w-16">감성</th>
-              <th className="text-left py-2 px-2 font-semibold">제목</th>
+              <th className="text-left py-2 px-2 font-semibold w-40">Time</th>
+              <th className="text-left py-2 px-2 font-semibold w-24">Source</th>
+              <th className="text-center py-2 px-2 font-semibold w-16">Sentiment</th>
+              <th className="text-left py-2 px-2 font-semibold">Title</th>
             </tr>
           </thead>
           <tbody>

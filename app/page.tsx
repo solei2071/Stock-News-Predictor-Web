@@ -35,16 +35,49 @@ interface AnalysisData {
   }[];
 }
 
+function Pulse({ className }: { className?: string }) {
+  return <div className={`animate-pulse rounded-lg bg-slate-700/50 ${className || ""}`} />;
+}
+
+function LoadingSkeleton() {
+  return (
+    <>
+      {/* MetricCards skeleton */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="bg-[#111a33] rounded-xl p-4">
+            <Pulse className="h-3 w-16 mb-3" />
+            <Pulse className="h-7 w-24 mb-2" />
+            <Pulse className="h-3 w-20" />
+          </div>
+        ))}
+      </div>
+      {/* Chart skeleton */}
+      <div className="bg-[#101a33] rounded-xl p-4 mb-6">
+        <Pulse className="h-4 w-48 mb-4" />
+        <Pulse className="h-[380px] w-full" />
+      </div>
+      {/* News skeleton */}
+      <div className="bg-[#101a33] rounded-xl p-4">
+        <Pulse className="h-4 w-24 mb-4" />
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Pulse key={i} className="h-8 w-full mb-2" />
+        ))}
+      </div>
+    </>
+  );
+}
+
 export default function Home() {
   const [data, setData] = useState<AnalysisData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState("대기 중");
+  const [status, setStatus] = useState("Ready");
 
   const handleSubmit = async (query: string, horizon: number, period: string) => {
     setLoading(true);
     setError(null);
-    setStatus("수집 중...");
+      setStatus("Collecting...");
 
     try {
       const res = await fetch("/api/analyze", {
@@ -56,15 +89,15 @@ export default function Home() {
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result.error || "분석 실패");
+        throw new Error(result.error || "Analysis failed");
       }
 
       setData(result);
-      setStatus(`완료 (${result.symbol} / ${result.latestDate})`);
+      setStatus(`Completed (${result.symbol} / ${result.latestDate})`);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "알 수 없는 오류";
+      const msg = err instanceof Error ? err.message : "Unknown error";
       setError(msg);
-      setStatus("실패");
+      setStatus("Failed");
     } finally {
       setLoading(false);
     }
@@ -73,8 +106,8 @@ export default function Home() {
   return (
     <main className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-blue-400">종목 뉴스 기반 가격 예측</h1>
-        <span className="text-sm text-slate-400">현재 상태: {status}</span>
+        <h1 className="text-3xl font-bold text-blue-400">News-based Stock Price Forecast</h1>
+        <span className="text-sm text-slate-400">Current status: {status}</span>
       </div>
 
       <SearchBar onSubmit={handleSubmit} loading={loading} />
@@ -85,24 +118,29 @@ export default function Home() {
         </div>
       )}
 
-      <MetricCards data={data} />
-
-      {data && (
+      {loading ? (
+        <LoadingSkeleton />
+      ) : (
         <>
-          <PriceChart
-            candles={data.candles}
-            predicted={data.predicted}
-            lower={data.lower}
-            upper={data.upper}
-            horizon={data.horizon}
-            currency={data.currency}
-          />
-          <NewsTable items={data.newsItems} />
+          <MetricCards data={data} />
+          {data && (
+            <>
+              <PriceChart
+                candles={data.candles}
+                predicted={data.predicted}
+                lower={data.lower}
+                upper={data.upper}
+                horizon={data.horizon}
+                currency={data.currency}
+              />
+              <NewsTable items={data.newsItems} />
+            </>
+          )}
         </>
       )}
 
       <footer className="mt-8 text-xs text-slate-500">
-        ※ 이 도구는 참고용 보조 지표이며 투자 조언이 아닙니다. 실제 매매 판단은 추가 확인 후 진행하세요.
+        This tool is for reference only and is not financial advice. Verify signals with additional checks before making trading decisions.
       </footer>
     </main>
   );

@@ -17,10 +17,10 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
 
   return (
     <form onSubmit={handleSubmit} className="bg-[#101a33] rounded-xl p-5 mb-6">
-      <h2 className="text-[#93c5fd] text-sm font-bold mb-4">분석 설정</h2>
+      <h2 className="text-[#93c5fd] text-sm font-bold mb-4">Analysis settings</h2>
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-slate-400">종목 / 회사명</label>
+          <label className="text-xs text-slate-400">Symbol / Company</label>
           <input
             name="query"
             type="text"
@@ -29,7 +29,7 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-slate-400">예측 영업일</label>
+          <label className="text-xs text-slate-400">Forecast horizon (trading days)</label>
           <input
             name="horizon"
             type="number"
@@ -40,17 +40,17 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-slate-400">가격 이력</label>
+          <label className="text-xs text-slate-400">Price history</label>
           <select
             name="period"
             defaultValue="6mo"
             className="bg-[#0f172a] text-slate-100 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
           >
-            <option value="1mo">1개월</option>
-            <option value="3mo">3개월</option>
-            <option value="6mo">6개월</option>
-            <option value="1y">1년</option>
-            <option value="2y">2년</option>
+            <option value="1mo">1 month</option>
+            <option value="3mo">3 months</option>
+            <option value="6mo">6 months</option>
+            <option value="1y">1 year</option>
+            <option value="2y">2 years</option>
           </select>
         </div>
         <button
@@ -58,7 +58,7 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
           disabled={loading}
           className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg px-6 py-2 text-sm transition-colors"
         >
-          {loading ? "분석 중..." : "예측 실행"}
+          {loading ? "Analyzing..." : "Run prediction"}
         </button>
       </div>
     </form>

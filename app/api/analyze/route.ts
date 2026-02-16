@@ -3,6 +3,23 @@ import { resolveSymbol, fetchPriceData, fetchNews } from "@/lib/yahoo";
 import { sentimentScore, NewsItem } from "@/lib/sentiment";
 import { clamp, linearForecast, volatility } from "@/lib/forecast";
 
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const cache = new Map<string, { data: unknown; expiry: number }>();
+
+function getCached(key: string): unknown | null {
+  const entry = cache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expiry) {
+    cache.delete(key);
+    return null;
+  }
+  return entry.data;
+}
+
+function setCache(key: string, data: unknown) {
+  cache.set(key, { data, expiry: Date.now() + CACHE_TTL });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
@@ -12,13 +29,13 @@ export async function POST(req: NextRequest) {
     const allowedPeriods = ["1mo", "3mo", "6mo", "1y", "2y"];
 
     if (!query) {
-      return NextResponse.json({ error: "종목명/티커를 입력해주세요." }, { status: 400 });
+      return NextResponse.json({ error: "Please enter a ticker or company name." }, { status: 400 });
     }
     if (!Number.isInteger(horizonRaw) || horizonRaw < 1 || horizonRaw > 60) {
-      return NextResponse.json({ error: "예측 영업일은 1~60 사이 정수여야 합니다." }, { status: 400 });
+      return NextResponse.json({ error: "Forecast horizon must be an integer between 1 and 60." }, { status: 400 });
     }
     if (!allowedPeriods.includes(period)) {
-      return NextResponse.json({ error: "조회 기간은 1mo, 3mo, 6mo, 1y, 2y만 허용됩니다." }, { status: 400 });
+      return NextResponse.json({ error: "Period must be one of 1mo, 3mo, 6mo, 1y, or 2y." }, { status: 400 });
     }
 
     const horizon = horizonRaw;
@@ -27,20 +44,26 @@ export async function POST(req: NextRequest) {
     try {
       symbol = await resolveSymbol(query);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "종목을 찾을 수 없습니다.";
+      const message = err instanceof Error ? err.message : "Symbol not found.";
       return NextResponse.json({ error: message }, { status: 404 });
+    }
+
+    const cacheKey = `${symbol}:${period}:${horizon}`;
+    const cached = getCached(cacheKey);
+    if (cached) {
+      return NextResponse.json(cached);
     }
 
     let priceData;
     try {
       priceData = await fetchPriceData(symbol, period);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "가격 데이터 조회 실패";
+      const message = err instanceof Error ? err.message : "Failed to fetch price data.";
       return NextResponse.json({ error: message }, { status: 502 });
     }
 
     if (!priceData.rows || priceData.rows.length === 0) {
-      return NextResponse.json({ error: "가격 데이터가 존재하지 않습니다." }, { status: 422 });
+      return NextResponse.json({ error: "No price data available." }, { status: 422 });
     }
     const { rows } = priceData;
 
@@ -59,11 +82,11 @@ export async function POST(req: NextRequest) {
     const { overall: sentiment, perItem } = await sentimentScore(newsItems);
 
     const hasNews = newsItems.length > 0;
-    let sentimentLabel = "중립(뉴스 없음)";
+    let sentimentLabel = "Neutral (No news)";
     if (hasNews) {
-      if (sentiment > 0.12) sentimentLabel = "긍정";
-      else if (sentiment < -0.12) sentimentLabel = "부정";
-      else sentimentLabel = "중립";
+      if (sentiment > 0.12) sentimentLabel = "Positive";
+      else if (sentiment < -0.12) sentimentLabel = "Negative";
+      else sentimentLabel = "Neutral";
     }
 
     const trendPct = linearForecast(prices, horizon);
@@ -82,9 +105,9 @@ export async function POST(req: NextRequest) {
     const trendConf = clamp(72 - Math.abs(vol) * 140, 20, 75);
     const confidence = clamp(15 + 0.45 * dataConf + 0.35 * newsConf + 0.2 * trendConf, 10, 95);
 
-    let signal = "보합";
-    if (finalPct >= 1.2) signal = "매수 관망";
-    else if (finalPct <= -1.2) signal = "주의";
+    let signal = "Hold";
+    if (finalPct >= 1.2) signal = "Buy watch";
+    else if (finalPct <= -1.2) signal = "Caution";
 
     const scoreByTitle = Object.fromEntries(perItem.map((p) => [p.title, p.score]));
     const newsPreview = newsItems.slice(0, 8).map((item) => ({
@@ -99,7 +122,7 @@ export async function POST(req: NextRequest) {
     const sliceLen = Math.max(30, horizon + 10);
     const slicedRows = rows.slice(-sliceLen);
 
-    return NextResponse.json({
+    const result = {
       symbol: priceData.symbol,
       name: priceData.name,
       exchange: priceData.exchange,
@@ -125,9 +148,12 @@ export async function POST(req: NextRequest) {
       confidence,
       newsCount: newsItems.length,
       newsItems: newsPreview,
-    });
+    };
+
+    setCache(cacheKey, result);
+    return NextResponse.json(result);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    const message = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
