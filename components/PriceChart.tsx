@@ -86,15 +86,15 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
 
   const allValues = candles
     .flatMap((c) => [c.open, c.high, c.low, c.close])
-    .concat([upper, lower, predicted])
+    .concat([predicted])
     .filter((value) => Number.isFinite(value) && value > 0);
 
   const minValue = Math.min(...allValues);
   const maxValue = Math.max(...allValues);
   const valueRange = maxValue - minValue;
-  const padding = valueRange > 0 ? valueRange * 0.03 : Math.max(minValue * 0.03, 1);
+  const padding = valueRange > 0 ? valueRange * 0.01 : Math.max(Math.abs(minValue) * 0.01, 0.1);
 
-  const minY = Math.max(0, minValue - padding);
+  const minY = minValue - padding;
   const maxY = maxValue + padding;
 
   const unit = currency === "USD" ? "$" : "";
