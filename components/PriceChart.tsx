@@ -92,7 +92,7 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
   const minValue = Math.min(...allValues);
   const maxValue = Math.max(...allValues);
   const valueRange = maxValue - minValue;
-  const padding = valueRange > 0 ? valueRange * 0.01 : Math.max(Math.abs(minValue) * 0.01, 0.1);
+  const padding = valueRange > 0 ? Math.max(valueRange * 0.001, 0.001) : 0.01;
 
   const minY = minValue - padding;
   const maxY = maxValue + padding;
