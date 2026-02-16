@@ -34,7 +34,7 @@ function formatDate(d: string | null) {
 export default function NewsTable({ items }: { items: NewsItem[] }) {
   if (!items || items.length === 0) {
     return (
-      <section className="glass-card p-4">
+      <section className="glass-card section-card p-4">
         <div className="section-title">Latest news</div>
         <p className="text-slate-500 text-sm">No news data.</p>
       </section>
@@ -42,40 +42,30 @@ export default function NewsTable({ items }: { items: NewsItem[] }) {
   }
 
   return (
-    <section className="glass-card p-4">
+    <section className="glass-card section-card p-4 h-full">
       <div className="section-title">Latest news</div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-slate-400 border-b border-slate-700">
-              <th className="text-left py-2 px-2 font-semibold w-40">Time</th>
-              <th className="text-left py-2 px-2 font-semibold w-28">Source</th>
-              <th className="text-left py-2 px-2 font-semibold w-20">Sentiment</th>
-              <th className="text-left py-2 px-2 font-semibold">Title</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, idx) => (
-              <tr
-                key={`${item.title}-${idx}`}
-                className="border-b border-slate-800 hover:bg-[#1e293b] transition-colors cursor-pointer"
-                onClick={() => item.link && window.open(item.link, "_blank")}
-              >
-                <td className="py-2 px-2 text-slate-400 whitespace-nowrap text-xs">{formatDate(item.published)}</td>
-                <td className="py-2 px-2 text-slate-400 truncate max-w-[120px] text-xs">{item.provider}</td>
-                <td className="py-2 px-2">
-                  <span className={`px-2 py-0.5 text-[11px] border rounded-full ${scoreClass(item.score)}`}>
-                    {item.score >= 0 ? "+" : ""}
-                    {item.score.toFixed(2)}
-                  </span>
-                </td>
-                <td className="py-2 px-2 text-slate-200 hover:text-cyan-300 transition-colors text-sm">
-                  {item.title}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="space-y-2">
+        {items.map((item, idx) => (
+          <article
+            key={`${item.title}-${idx}`}
+            className="rounded-lg border border-slate-700/40 bg-slate-950/20 p-3 hover:bg-slate-900/40 transition-colors cursor-pointer"
+            onClick={() => item.link && window.open(item.link, "_blank")}
+          >
+            <div className="flex flex-wrap items-start gap-2 justify-between">
+              <h3 className="text-sm text-slate-200 leading-snug flex-1 min-w-[220px]">{item.title}</h3>
+              <span className={`px-2 py-0.5 text-[11px] border rounded-full ${scoreClass(item.score)} shrink-0`}>
+                {item.score >= 0 ? "+" : ""}
+                {item.score.toFixed(2)}
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-2 news-summary">{item.summary}</p>
+            <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-slate-500">
+              <span>{item.provider}</span>
+              <span>·</span>
+              <span>{formatDate(item.published)}</span>
+            </div>
+          </article>
+        ))}
       </div>
     </section>
   );

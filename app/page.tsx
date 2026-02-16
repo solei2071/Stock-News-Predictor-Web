@@ -109,34 +109,34 @@ export default function Home() {
   };
 
   return (
-    <main className="max-w-7xl mx-auto px-4 py-8 space-y-6">
-      <header className="glass-card p-6">
-        <p className="text-xs uppercase tracking-[0.2em] text-cyan-300 mb-2">Market Intelligence</p>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-100">Market Pulse</h1>
-            <p className="text-sm muted-text mt-2">
-              Stock signal dashboard powered by finance data and sentiment analysis.
-            </p>
-          </div>
-          <div
-            className={`text-xs border rounded-full px-3 py-1 ${statusClass(status)} transition`}
-            role="status"
-          >
-            {status}
+    <main className="mx-auto max-w-7xl px-4 py-8 md:py-10 space-y-6">
+      <div className="hero-shell">
+        <header className="hero-card p-6 lg:p-8">
+          <p className="hero-kicker">Market Intelligence</p>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 className="hero-title">Market Pulse</h1>
+              <p className="mt-2 max-w-2xl hero-copy">
+                Stock signal dashboard with price forecasting and sentiment analysis across multiple data sources.
+              </p>
+            </div>
+            <div
+              className={`status-chip ${statusClass(status)} transition`}
+              role="status"
+            >
+              {status}
+            </div>
           </div>
         </div>
-      </header>
+      </div>
 
       <SearchBar onSubmit={handleSubmit} loading={loading} />
 
-      {error && (
-        <div className="bg-rose-900/30 border border-rose-700/60 rounded-xl p-4 text-rose-200 text-sm">
-          {error}
-        </div>
-      )}
+      {error && <div className="alert-error">{error}</div>}
 
-      <AdSenseUnit slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP} />
+      <section>
+        <AdSenseUnit slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP} className="ad-shell" />
+      </section>
 
       {loading ? (
         <LoadingSkeleton />
@@ -159,7 +159,9 @@ export default function Home() {
         </>
       )}
 
-      <AdSenseUnit slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BOT} />
+      <section>
+        <AdSenseUnit slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BOT} className="ad-shell" />
+      </section>
       <SiteFooter />
     </main>
   );

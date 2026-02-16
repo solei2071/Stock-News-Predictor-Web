@@ -109,11 +109,14 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="glass-card p-5 mb-6 fade-in">
+    <form onSubmit={handleSubmit} className="glass-card form-card p-5 fade-in">
       <div className="section-title">Analysis settings</div>
       <div className="flex flex-wrap items-end gap-3">
-        <div className="flex flex-col gap-1 relative" ref={wrapperRef}>
-          <label className="text-xs text-slate-400">Symbol / Company</label>
+        <div
+          className="flex flex-col gap-1 relative w-full md:flex-[1_1_24rem]"
+          ref={wrapperRef}
+        >
+          <label className="field-label">Symbol / Company</label>
           <input
             name="query"
             type="text"
@@ -122,17 +125,17 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => query.trim().length > 0 && (!showDropdown || suggestions.length === 0) && fetchSuggestions(query)}
             onKeyDown={handleKeyDown}
-            className="bg-[#0b172f] text-slate-100 border border-slate-700/80 rounded-lg px-3 py-2 w-64 md:w-72 text-sm focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition"
+            className="control-input text-slate-100 rounded-xl px-5 py-3 text-base w-full focus:outline-none transition"
           />
           {showDropdown && suggestions.length > 0 && (
-            <ul className="absolute top-full left-0 mt-1 w-72 md:w-80 bg-[#0b172f] border border-slate-700 rounded-lg shadow-xl z-50 overflow-hidden">
+            <ul className="absolute top-full left-0 mt-1 w-full glass-card rounded-xl shadow-xl z-50 overflow-hidden">
               {suggestions.map((s, i) => (
                 <li
                   key={s.symbol}
                   onMouseDown={() => selectSuggestion(s)}
                   onMouseEnter={() => setActiveIndex(i)}
                   className={`flex items-center justify-between px-3 py-2 cursor-pointer text-sm transition-colors ${
-                    i === activeIndex ? "bg-cyan-500/20" : "hover:bg-slate-800/80"
+                    i === activeIndex ? "bg-cyan-500/20" : "hover:bg-slate-800/50"
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
@@ -145,30 +148,31 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
             </ul>
           )}
           {showDropdown && suggestions.length === 0 && (
-            <ul className="absolute top-full left-0 mt-1 w-72 md:w-80 bg-[#0b172f] border border-slate-700 rounded-lg shadow-xl z-50 overflow-hidden">
+            <ul className="absolute top-full left-0 mt-1 w-full glass-card rounded-lg shadow-xl z-50 overflow-hidden">
               <li className="px-3 py-2 text-sm text-slate-400">
                 {loadingSuggestions ? "Searching..." : "No matches found."}
               </li>
             </ul>
           )}
         </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-slate-400">Forecast horizon (trading days)</label>
+        <div className="flex flex-col gap-1 w-36">
+          <label className="field-label">Forecast horizon</label>
           <input
             name="horizon"
             type="number"
             defaultValue={7}
             min={1}
             max={60}
-            className="bg-[#0b172f] text-slate-100 border border-slate-700/80 rounded-lg px-3 py-2 w-24 text-sm focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+            className="control-input text-slate-100 rounded-xl px-3 py-2.5 w-full text-sm focus:outline-none"
+            inputMode="numeric"
           />
         </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-slate-400">Price history</label>
+        <div className="flex flex-col gap-1 w-40">
+          <label className="field-label">Price history</label>
           <select
             name="period"
             defaultValue="6mo"
-            className="bg-[#0b172f] text-slate-100 border border-slate-700/80 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+            className="control-input text-slate-100 rounded-xl px-3 py-2.5 text-sm focus:outline-none"
           >
             <option value="1mo">1 month</option>
             <option value="3mo">3 months</option>
@@ -180,7 +184,7 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
         <button
           type="submit"
           disabled={loading}
-          className="bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg px-6 py-2 text-sm transition-colors shadow-md"
+          className="chip-btn font-semibold rounded-xl px-5 py-2.5 text-sm transition-colors shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {loading ? "Analyzing..." : "Run prediction"}
         </button>

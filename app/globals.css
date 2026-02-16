@@ -1,15 +1,16 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;700&display=swap");
 
 :root {
-  --background: radial-gradient(circle at 8% 12%, #18213c 0%, #0b1220 44%, #070b16 100%);
+  --background: linear-gradient(160deg, #0a1020 0%, #090f1a 32%, #050a14 100%);
   --foreground: #e2e8f0;
-  --panel: rgba(12, 21, 43, 0.62);
-  --panel-border: rgba(148, 163, 184, 0.18);
-  --panel-accent: rgba(56, 189, 248, 0.2);
+  --panel: rgba(8, 15, 34, 0.62);
+  --panel-border: rgba(148, 163, 184, 0.2);
+  --panel-accent: rgba(56, 189, 248, 0.25);
   --text-muted: #94a3b8;
   --success: #34d399;
   --danger: #f87171;
-  --glow: 0 20px 45px rgba(2, 6, 23, 0.45);
+  --glow: 0 24px 50px rgba(2, 6, 23, 0.5);
 }
 
 @theme inline {
@@ -20,7 +21,30 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Inter", "Segoe UI", Arial, Helvetica, sans-serif;
+  font-family: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -30vmax -35vmax auto -35vmax;
+  height: 55vmax;
+  background: radial-gradient(circle at 35% 10%, rgba(56, 189, 248, 0.12), transparent 58%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: auto auto -30vmax 55vmax;
+  height: 45vmax;
+  width: 45vmax;
+  background: radial-gradient(circle at 10% 10%, rgba(129, 140, 248, 0.11), transparent 58%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 * {
@@ -62,4 +86,148 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.hero-shell {
+  position: relative;
+}
+
+.hero-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  background: linear-gradient(130deg, rgba(56, 189, 248, 0.2), rgba(129, 140, 248, 0.08), transparent 70%);
+  filter: blur(14px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.hero-card {
+  position: relative;
+  z-index: 1;
+  border-radius: 22px;
+  background: linear-gradient(150deg, rgba(17, 24, 39, 0.9), rgba(15, 23, 42, 0.68));
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.hero-kicker {
+  margin: 0 0 0.65rem;
+  color: #67e8f9;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.hero-title {
+  font-family: "Sora", "Manrope", sans-serif;
+  font-size: clamp(2rem, 3.4vw, 3.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.018em;
+  font-weight: 700;
+}
+
+.hero-copy {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.status-chip {
+  font-size: 0.73rem;
+  border-radius: 9999px;
+  padding: 0.42rem 0.78rem;
+  border: 1px solid;
+  backdrop-filter: blur(6px);
+  letter-spacing: 0.02em;
+}
+
+.alert-error {
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  border-left-width: 3px;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  color: #fecdd3;
+  font-size: 0.9rem;
+}
+
+.ad-shell {
+  padding: 0.95rem;
+}
+
+.form-card {
+  border-radius: 18px;
+}
+
+.field-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a5b4fc;
+  font-weight: 600;
+}
+
+.control-input {
+  background: rgba(10, 19, 38, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+.control-input:focus-visible {
+  border-color: rgba(34, 211, 238, 0.7);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.18);
+}
+
+.chip-btn {
+  color: #e2e8f0;
+  background: linear-gradient(135deg, #0891b2 0%, #2563eb 55%, #4f46e5 100%);
+}
+
+.chip-btn:hover {
+  transform: translateY(-1px);
+  filter: saturate(1.08);
+}
+
+.card-title {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+
+.card-stat {
+  position: relative;
+  border-radius: 16px;
+  background: rgba(14, 22, 40, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.card-stat::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  border-radius: 16px 16px 0 0;
+  background: linear-gradient(90deg, rgba(34, 211, 238, 0.1), rgba(96, 165, 250, 0.6), rgba(129, 140, 248, 0.15));
+}
+
+.stat-value {
+  font-family: "Sora", "Manrope", sans-serif;
+  font-size: clamp(1.2rem, 1.9vw, 1.85rem);
+  letter-spacing: -0.02em;
+}
+
+.section-card {
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.news-summary {
+  display: -webkit-box;
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }

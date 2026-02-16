@@ -48,9 +48,9 @@ interface ChartDataPoint {
 export default function PriceChart({ candles, predicted, lower, upper, horizon, currency }: PriceChartProps) {
   if (!candles || candles.length < 2) {
     return (
-      <section className="glass-card p-4 mb-6">
+      <section className="glass-card section-card p-4 mb-6">
         <h2 className="section-title">Price trend</h2>
-        <div className="h-[300px] flex items-center justify-center text-slate-500">No chart data</div>
+        <div className="h-[320px] flex items-center justify-center text-slate-500">No chart data</div>
       </section>
     );
   }
@@ -108,14 +108,14 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
   const unit = currency === "USD" ? "$" : "";
 
   return (
-    <section className="glass-card p-4 mb-6 fade-in">
-      <h2 className="section-title">Price trend</h2>
-      <p className="text-xs muted-text mb-4">
-        Last {candles.length} trading days · Forecast interval: {horizon} days
-      </p>
+      <section className="glass-card section-card p-4 mb-6 fade-in">
+        <h2 className="section-title">Price trend</h2>
+        <p className="text-xs muted-text mb-4">
+          Last {candles.length} trading days · Forecast interval: {horizon} days
+        </p>
       <ResponsiveContainer width="100%" height={430}>
         <ComposedChart data={chartData} margin={{ top: 12, right: 24, left: 6, bottom: 8 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1f2a44" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#24324f" />
           <XAxis
             dataKey="date"
             tick={{ fill: "#94a3b8", fontSize: 10 }}
@@ -135,7 +135,7 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
           />
           <Tooltip
             contentStyle={{
-              background: "#0f172a",
+              background: "rgba(10, 17, 35, 0.95)",
               border: "1px solid #334155",
               borderRadius: 8,
               color: "#e2e8f0",
