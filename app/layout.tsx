@@ -19,8 +19,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased min-h-screen text-slate-100">
+      <head>
         <AdSenseScript />
+      </head>
+      <body className="antialiased min-h-screen text-slate-100">
         {children}
       </body>
     </html>
