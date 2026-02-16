@@ -4,6 +4,7 @@ import { sentimentScore, NewsItem } from "@/lib/sentiment";
 import { clamp, linearForecast, volatility } from "@/lib/forecast";
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const MAX_CACHE_SIZE = 100;
 const cache = new Map<string, { data: unknown; expiry: number }>();
 
 function getCached(key: string): unknown | null {
@@ -17,6 +18,19 @@ function getCached(key: string): unknown | null {
 }
 
 function setCache(key: string, data: unknown) {
+  // Evict expired entries and enforce size limit
+  if (cache.size >= MAX_CACHE_SIZE) {
+    const now = Date.now();
+    for (const [k, v] of cache) {
+      if (now > v.expiry) cache.delete(k);
+    }
+    // If still over limit, delete oldest entries
+    while (cache.size >= MAX_CACHE_SIZE) {
+      const firstKey = cache.keys().next().value;
+      if (firstKey !== undefined) cache.delete(firstKey);
+      else break;
+    }
+  }
   cache.set(key, { data, expiry: Date.now() + CACHE_TTL });
 }
 

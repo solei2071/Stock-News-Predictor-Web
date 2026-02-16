@@ -1,4 +1,11 @@
 const USER_AGENT = "Mozilla/5.0 (compatible; StockNewsPredictor/2.0)";
+const FETCH_TIMEOUT = 10_000; // 10 seconds
+
+function fetchWithTimeout(url: string, init?: RequestInit, timeout = FETCH_TIMEOUT): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+  return fetch(url, { ...init, signal: controller.signal }).finally(() => clearTimeout(timer));
+}
 
 export interface PriceRow {
   date: string;
@@ -22,7 +29,7 @@ export async function resolveSymbol(query: string): Promise<string> {
   if (!q) throw new Error("Please enter a ticker or company name.");
 
   const url = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(q)}&quotesCount=10&newsCount=0&listsCount=0`;
-  const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
+  const res = await fetchWithTimeout(url, { headers: { "User-Agent": USER_AGENT } });
   if (!res.ok) throw new Error(`Yahoo search failed: ${res.status}`);
   const data = await res.json();
 
@@ -77,7 +84,7 @@ export async function fetchPriceData(
   period: string = "6mo"
 ): Promise<PriceData> {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=${encodeURIComponent(period)}&includeAdjustedClose=true`;
-  const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
+  const res = await fetchWithTimeout(url, { headers: { "User-Agent": USER_AGENT } });
   if (!res.ok) throw new Error(`Failed to fetch price data: ${res.status}`);
   const payload = await res.json();
 
@@ -148,7 +155,7 @@ export async function fetchNews(
   const url = `https://finnhub.io/api/v1/company-news?symbol=${encodeURIComponent(symbol)}&from=${fromStr}&to=${toStr}&token=${apiKey}`;
 
   try {
-    const res = await fetch(url);
+    const res = await fetchWithTimeout(url);
     if (!res.ok) return [];
     const data = await res.json();
     if (!Array.isArray(data)) return [];

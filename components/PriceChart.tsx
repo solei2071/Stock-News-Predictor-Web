@@ -86,8 +86,8 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
 
   const allValues = candles
     .flatMap((c) => [c.open, c.high, c.low, c.close])
-    .concat([predicted])
-    .filter((value) => Number.isFinite(value) && value > 0);
+    .concat([predicted, lower, upper])
+    .filter((value) => Number.isFinite(value));
   if (allValues.length === 0) {
     return (
       <div className="bg-[#101a33] rounded-xl p-6 mb-6 h-[400px] flex items-center justify-center text-slate-500">
@@ -101,7 +101,7 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
   const valueRange = maxValue - minValue;
   const padding = valueRange > 0 ? valueRange * 0.02 : Math.max(minValue * 0.01, 0.1);
 
-  const minY = Math.max(0, minValue - padding);
+  const minY = minValue - padding;
   const maxY = maxValue + padding;
 
   const unit = currency === "USD" ? "$" : "";
