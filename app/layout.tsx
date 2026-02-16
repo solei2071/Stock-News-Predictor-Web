@@ -3,8 +3,13 @@ import "./globals.css";
 import AdSenseScript from "@/components/AdSenseScript";
 
 export const metadata: Metadata = {
-  title: "Stock News Predictor",
-  description: "Stock price forecast based on financial news sentiment.",
+  title: "Market Pulse",
+  description: "News-backed stock forecasting and sentiment analysis with interactive charts.",
+  openGraph: {
+    title: "Market Pulse",
+    description: "News-backed stock forecasting and sentiment analysis with interactive charts.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -14,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased bg-[#0b1220] text-slate-100 min-h-screen">
+      <body className="antialiased min-h-screen text-slate-100">
         <AdSenseScript />
         {children}
       </body>

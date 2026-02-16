@@ -44,6 +44,7 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
       });
       if (!res.ok) {
         setSuggestions([]);
+        setShowDropdown(true);
         return;
       }
       const data: Suggestion[] = await res.json();
@@ -108,9 +109,9 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-[#101a33] rounded-xl p-5 mb-6">
-      <h2 className="text-[#93c5fd] text-sm font-bold mb-4">Analysis settings</h2>
-      <div className="flex flex-wrap items-end gap-4">
+    <form onSubmit={handleSubmit} className="glass-card p-5 mb-6 fade-in">
+      <div className="section-title">Analysis settings</div>
+      <div className="flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1 relative" ref={wrapperRef}>
           <label className="text-xs text-slate-400">Symbol / Company</label>
           <input
@@ -119,23 +120,23 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
             autoComplete="off"
             value={query}
             onChange={(e) => handleInputChange(e.target.value)}
-            onFocus={() => query.trim().length > 0 && !showDropdown && fetchSuggestions(query)}
+            onFocus={() => query.trim().length > 0 && (!showDropdown || suggestions.length === 0) && fetchSuggestions(query)}
             onKeyDown={handleKeyDown}
-            className="bg-[#0f172a] text-slate-100 border border-slate-700 rounded-lg px-3 py-2 w-56 text-sm focus:outline-none focus:border-blue-500"
+            className="bg-[#0b172f] text-slate-100 border border-slate-700/80 rounded-lg px-3 py-2 w-64 md:w-72 text-sm focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition"
           />
           {showDropdown && suggestions.length > 0 && (
-            <ul className="absolute top-full left-0 mt-1 w-72 bg-[#0f172a] border border-slate-700 rounded-lg shadow-xl z-50 overflow-hidden">
+            <ul className="absolute top-full left-0 mt-1 w-72 md:w-80 bg-[#0b172f] border border-slate-700 rounded-lg shadow-xl z-50 overflow-hidden">
               {suggestions.map((s, i) => (
                 <li
                   key={s.symbol}
                   onMouseDown={() => selectSuggestion(s)}
                   onMouseEnter={() => setActiveIndex(i)}
                   className={`flex items-center justify-between px-3 py-2 cursor-pointer text-sm transition-colors ${
-                    i === activeIndex ? "bg-blue-600/30" : "hover:bg-slate-800"
+                    i === activeIndex ? "bg-cyan-500/20" : "hover:bg-slate-800/80"
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-blue-400 font-semibold shrink-0">{s.symbol}</span>
+                    <span className="text-cyan-300 font-semibold shrink-0">{s.symbol}</span>
                     <span className="text-slate-300 truncate">{s.name}</span>
                   </div>
                   <span className="text-xs text-slate-500 shrink-0 ml-2">{s.exchange}</span>
@@ -144,7 +145,7 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
             </ul>
           )}
           {showDropdown && suggestions.length === 0 && (
-            <ul className="absolute top-full left-0 mt-1 w-72 bg-[#0f172a] border border-slate-700 rounded-lg shadow-xl z-50 overflow-hidden">
+            <ul className="absolute top-full left-0 mt-1 w-72 md:w-80 bg-[#0b172f] border border-slate-700 rounded-lg shadow-xl z-50 overflow-hidden">
               <li className="px-3 py-2 text-sm text-slate-400">
                 {loadingSuggestions ? "Searching..." : "No matches found."}
               </li>
@@ -159,7 +160,7 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
             defaultValue={7}
             min={1}
             max={60}
-            className="bg-[#0f172a] text-slate-100 border border-slate-700 rounded-lg px-3 py-2 w-20 text-sm focus:outline-none focus:border-blue-500"
+            className="bg-[#0b172f] text-slate-100 border border-slate-700/80 rounded-lg px-3 py-2 w-24 text-sm focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -167,7 +168,7 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
           <select
             name="period"
             defaultValue="6mo"
-            className="bg-[#0f172a] text-slate-100 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+            className="bg-[#0b172f] text-slate-100 border border-slate-700/80 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
           >
             <option value="1mo">1 month</option>
             <option value="3mo">3 months</option>
@@ -179,7 +180,7 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
         <button
           type="submit"
           disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg px-6 py-2 text-sm transition-colors"
+          className="bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg px-6 py-2 text-sm transition-colors shadow-md"
         >
           {loading ? "Analyzing..." : "Run prediction"}
         </button>

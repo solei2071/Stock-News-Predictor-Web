@@ -48,9 +48,10 @@ interface ChartDataPoint {
 export default function PriceChart({ candles, predicted, lower, upper, horizon, currency }: PriceChartProps) {
   if (!candles || candles.length < 2) {
     return (
-      <div className="bg-[#101a33] rounded-xl p-6 mb-6 h-[400px] flex items-center justify-center text-slate-500">
-        No chart data
-      </div>
+      <section className="glass-card p-4 mb-6">
+        <h2 className="section-title">Price trend</h2>
+        <div className="h-[300px] flex items-center justify-center text-slate-500">No chart data</div>
+      </section>
     );
   }
 
@@ -65,7 +66,7 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
       bodyBottom: Math.min(c.open, c.close),
       bodyHeight: Math.abs(c.close - c.open) || 0.01,
       wickRange: [c.low, c.high] as [number, number],
-      color: isUp ? "#22c55e" : "#ef4444",
+      color: isUp ? "#34d399" : "#f87171",
     };
   });
 
@@ -79,7 +80,7 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
     bodyBottom: Math.min(lastCandle.close, predicted),
     bodyHeight: Math.abs(predicted - lastCandle.close) || 0.01,
     wickRange: [lower, upper],
-    color: predicted >= lastCandle.close ? "#22c55e" : "#ef4444",
+    color: predicted >= lastCandle.close ? "#34d399" : "#f87171",
     predicted,
     isForecast: true,
   });
@@ -90,29 +91,30 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
     .filter((value) => Number.isFinite(value));
   if (allValues.length === 0) {
     return (
-      <div className="bg-[#101a33] rounded-xl p-6 mb-6 h-[400px] flex items-center justify-center text-slate-500">
-        No valid chart data
-      </div>
+      <section className="glass-card p-4 mb-6">
+        <h2 className="section-title">Price trend</h2>
+        <div className="h-[300px] flex items-center justify-center text-slate-500">No valid chart data</div>
+      </section>
     );
   }
 
   const minValue = Math.min(...allValues);
   const maxValue = Math.max(...allValues);
   const valueRange = maxValue - minValue;
-  const padding = valueRange > 0 ? valueRange * 0.02 : Math.max(minValue * 0.01, 0.1);
+  const padding = valueRange > 0 ? valueRange * 0.03 : Math.max(minValue * 0.01, 0.1);
 
   const minY = minValue - padding;
   const maxY = maxValue + padding;
-
   const unit = currency === "USD" ? "$" : "";
 
   return (
-    <div className="bg-[#101a33] rounded-xl p-4 mb-6">
-      <h2 className="text-[#93c5fd] text-sm font-bold mb-3">
-        Price trend · Last {candles.length} trading days + Forecast in {horizon} trading days
-      </h2>
-      <ResponsiveContainer width="100%" height={400}>
-        <ComposedChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 0 }}>
+    <section className="glass-card p-4 mb-6 fade-in">
+      <h2 className="section-title">Price trend</h2>
+      <p className="text-xs muted-text mb-4">
+        Last {candles.length} trading days · Forecast interval: {horizon} days
+      </p>
+      <ResponsiveContainer width="100%" height={430}>
+        <ComposedChart data={chartData} margin={{ top: 12, right: 24, left: 6, bottom: 8 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#1f2a44" />
           <XAxis
             dataKey="date"
@@ -126,10 +128,10 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
           />
           <YAxis
             domain={[minY, maxY]}
-            allowDataOverflow={true}
+            allowDataOverflow
             tick={{ fill: "#94a3b8", fontSize: 10 }}
-            tickFormatter={(v: number) => `${unit}${v.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
-            width={70}
+            tickFormatter={(v: number) => `${unit}${v.toLocaleString(undefined, { maximumFractionDigits: 2 })}`}
+            width={78}
           />
           <Tooltip
             contentStyle={{
@@ -139,8 +141,7 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
               color: "#e2e8f0",
               fontSize: 12,
             }}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            formatter={((value: any, name: any) => {
+            formatter={((value: unknown, name: unknown) => {
               if (value == null) return ["-", name ?? ""];
               const labels: Record<string, string> = {
                 close: "Close",
@@ -160,7 +161,7 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
               <Cell
                 key={index}
                 fill={entry.isForecast ? "#3b82f6" : entry.color}
-                fillOpacity={entry.isForecast ? 0.6 : 1}
+                fillOpacity={entry.isForecast ? 0.65 : 1}
                 stroke={entry.isForecast ? "#60a5fa" : entry.color}
                 strokeDasharray={entry.isForecast ? "4 2" : undefined}
               />
@@ -170,25 +171,24 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
           <Line
             type="monotone"
             dataKey="close"
-            stroke="#7dd3fc"
+            stroke="#93c5fd"
             strokeWidth={1.5}
             dot={false}
             isAnimationActive={false}
           />
 
-          {predicted && (
-            <ReferenceLine
-              y={predicted}
-              stroke="#3b82f6"
-              strokeDasharray="6 3"
-              label={{
-                value: `Forecast: ${unit}${predicted.toFixed(2)}`,
-                fill: "#93c5fd",
-                fontSize: 11,
-                position: "right",
-              }}
-            />
-          )}
+          <ReferenceLine
+            y={predicted}
+            stroke="#3b82f6"
+            strokeDasharray="6 3"
+            strokeWidth={1.1}
+            label={{
+              value: `Forecast: ${unit}${predicted.toFixed(2)}`,
+              fill: "#93c5fd",
+              fontSize: 11,
+              position: "right",
+            }}
+          />
 
           <ReferenceArea
             y1={lower}
@@ -196,12 +196,12 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
             x1={chartData[chartData.length - 2]?.date}
             x2={chartData[chartData.length - 1]?.date}
             fill="#3b82f6"
-            fillOpacity={0.08}
+            fillOpacity={0.09}
             stroke="#3b82f6"
-            strokeOpacity={0.3}
+            strokeOpacity={0.32}
           />
         </ComposedChart>
       </ResponsiveContainer>
-    </div>
+    </section>
   );
 }
