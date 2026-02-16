@@ -1,65 +1,109 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import SearchBar from "@/components/SearchBar";
+import MetricCards from "@/components/MetricCards";
+import PriceChart from "@/components/PriceChart";
+import NewsTable from "@/components/NewsTable";
+
+interface AnalysisData {
+  symbol: string;
+  name: string;
+  exchange: string;
+  currency: string;
+  currentPrice: number;
+  latestDate: string;
+  candles: { date: string; open: number; high: number; low: number; close: number }[];
+  horizon: number;
+  trendPct: number;
+  sentiment: number;
+  sentimentLabel: string;
+  finalPct: number;
+  predicted: number;
+  lower: number;
+  upper: number;
+  signal: string;
+  confidence: number;
+  newsCount: number;
+  newsItems: {
+    title: string;
+    provider: string;
+    published: string | null;
+    summary: string;
+    link: string;
+    score: number;
+  }[];
+}
 
 export default function Home() {
+  const [data, setData] = useState<AnalysisData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState("대기 중");
+
+  const handleSubmit = async (query: string, horizon: number, period: string) => {
+    setLoading(true);
+    setError(null);
+    setStatus("수집 중...");
+
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query, horizon, period }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "분석 실패");
+      }
+
+      setData(result);
+      setStatus(`완료 (${result.symbol} / ${result.latestDate})`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "알 수 없는 오류";
+      setError(msg);
+      setStatus("실패");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="max-w-7xl mx-auto px-4 py-8">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold text-blue-400">종목 뉴스 기반 가격 예측</h1>
+        <span className="text-sm text-slate-400">현재 상태: {status}</span>
+      </div>
+
+      <SearchBar onSubmit={handleSubmit} loading={loading} />
+
+      {error && (
+        <div className="bg-red-900/30 border border-red-700 rounded-xl p-4 mb-6 text-red-300 text-sm">
+          {error}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      )}
+
+      <MetricCards data={data} />
+
+      {data && (
+        <>
+          <PriceChart
+            candles={data.candles}
+            predicted={data.predicted}
+            lower={data.lower}
+            upper={data.upper}
+            horizon={data.horizon}
+            currency={data.currency}
+          />
+          <NewsTable items={data.newsItems} />
+        </>
+      )}
+
+      <footer className="mt-8 text-xs text-slate-500">
+        ※ 이 도구는 참고용 보조 지표이며 투자 조언이 아닙니다. 실제 매매 판단은 추가 확인 후 진행하세요.
+      </footer>
+    </main>
   );
 }
