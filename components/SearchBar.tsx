@@ -15,7 +15,7 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
-  const [query, setQuery] = useState("AAPL");
+  const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
@@ -121,6 +121,7 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
             name="query"
             type="text"
             autoComplete="off"
+            placeholder="Type the company or symbol"
             value={query}
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => query.trim().length > 0 && (!showDropdown || suggestions.length === 0) && fetchSuggestions(query)}
