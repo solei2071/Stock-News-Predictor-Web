@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       link: n.link,
     }));
 
-    const { overall: sentiment, perItem } = sentimentScore(newsItems);
+    const { overall: sentiment, perItem } = await sentimentScore(newsItems);
 
     const hasNews = newsItems.length > 0;
     let sentimentLabel = "중립(뉴스 없음)";
