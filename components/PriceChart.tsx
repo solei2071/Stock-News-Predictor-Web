@@ -84,9 +84,18 @@ export default function PriceChart({ candles, predicted, lower, upper, horizon, 
     isForecast: true,
   });
 
-  const allValues = candles.flatMap((c) => [c.high, c.low]).concat([upper, lower]);
-  const minY = Math.min(...allValues) * 0.995;
-  const maxY = Math.max(...allValues) * 1.005;
+  const allValues = candles
+    .flatMap((c) => [c.open, c.high, c.low, c.close])
+    .concat([upper, lower, predicted])
+    .filter((value) => Number.isFinite(value) && value > 0);
+
+  const minValue = Math.min(...allValues);
+  const maxValue = Math.max(...allValues);
+  const valueRange = maxValue - minValue;
+  const padding = valueRange > 0 ? valueRange * 0.12 : Math.max(minValue * 0.1, 1);
+
+  const minY = minValue - padding;
+  const maxY = maxValue + padding;
 
   const unit = currency === "USD" ? "$" : "";
 
