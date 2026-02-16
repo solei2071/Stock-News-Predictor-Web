@@ -5,19 +5,43 @@ import { clamp, linearForecast, volatility } from "@/lib/forecast";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const query = (body.query || "").trim();
-    const horizon = clamp(parseInt(body.horizon) || 7, 1, 60);
-    const period = ["1mo", "3mo", "6mo", "1y", "2y"].includes(body.period)
-      ? body.period
-      : "6mo";
+    const body = await req.json().catch(() => ({}));
+    const query = String(body.query || "").trim();
+    const horizonRaw = Number(body.horizon);
+    const period = body.period;
+    const allowedPeriods = ["1mo", "3mo", "6mo", "1y", "2y"];
 
     if (!query) {
       return NextResponse.json({ error: "종목명/티커를 입력해주세요." }, { status: 400 });
     }
+    if (!Number.isInteger(horizonRaw) || horizonRaw < 1 || horizonRaw > 60) {
+      return NextResponse.json({ error: "예측 영업일은 1~60 사이 정수여야 합니다." }, { status: 400 });
+    }
+    if (!allowedPeriods.includes(period)) {
+      return NextResponse.json({ error: "조회 기간은 1mo, 3mo, 6mo, 1y, 2y만 허용됩니다." }, { status: 400 });
+    }
 
-    const symbol = await resolveSymbol(query);
-    const priceData = await fetchPriceData(symbol, period);
+    const horizon = horizonRaw;
+
+    let symbol: string;
+    try {
+      symbol = await resolveSymbol(query);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "종목을 찾을 수 없습니다.";
+      return NextResponse.json({ error: message }, { status: 404 });
+    }
+
+    let priceData;
+    try {
+      priceData = await fetchPriceData(symbol, period);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "가격 데이터 조회 실패";
+      return NextResponse.json({ error: message }, { status: 502 });
+    }
+
+    if (!priceData.rows || priceData.rows.length === 0) {
+      return NextResponse.json({ error: "가격 데이터가 존재하지 않습니다." }, { status: 422 });
+    }
     const { rows } = priceData;
 
     const prices = rows.map((r) => r.close);
