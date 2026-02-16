@@ -127,7 +127,7 @@ export default function Home() {
               {status}
             </div>
           </div>
-        </div>
+        </header>
       </div>
 
       <SearchBar onSubmit={handleSubmit} loading={loading} />

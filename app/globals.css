@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;700&display=swap");
+@import "tailwindcss";
 
 :root {
   --background: linear-gradient(160deg, #0a1020 0%, #090f1a 32%, #050a14 100%);
