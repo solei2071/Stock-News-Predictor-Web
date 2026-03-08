@@ -12,33 +12,44 @@ interface AdSenseUnitProps {
   slot?: string;
   className?: string;
   label?: string;
+  enabled?: boolean;
 }
 
-export default function AdSenseUnit({ slot, className, label = "Advertisement" }: AdSenseUnitProps) {
+function isValidClientId(clientId?: string) {
+  return Boolean(clientId && /^ca-pub-\d{10,}$/.test(clientId));
+}
+
+function isValidSlot(slot?: string) {
+  return Boolean(slot && /^\d+$/.test(slot));
+}
+
+export default function AdSenseUnit({
+  slot,
+  className,
+  label = "Advertisement",
+  enabled = true,
+}: AdSenseUnitProps) {
   const clientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
   const adSlot = slot || process.env.NEXT_PUBLIC_ADSENSE_SLOT;
+  const canRender = enabled && isValidClientId(clientId) && isValidSlot(adSlot);
 
   useEffect(() => {
-    if (clientId && adSlot && typeof window !== "undefined") {
+    if (canRender && typeof window !== "undefined") {
       try {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch {
         // ignore
       }
     }
-  }, [clientId, adSlot]);
+  }, [canRender]);
 
-  if (!clientId || !adSlot) {
-    return (
-      <div className={`glass-card p-4 ${className || ""}`}>
-        <p className="text-xs text-slate-500">{label} is not configured.</p>
-      </div>
-    );
+  if (!canRender) {
+    return null;
   }
 
   return (
     <section className={`glass-card p-4 ${className || ""}`}>
-      <p className="text-[10px] uppercase tracking-[0.16em] text-slate-400 mb-2">Advertisement</p>
+      <p className="mb-2 text-[10px] uppercase tracking-[0.16em] text-slate-400">{label}</p>
       <ins
         className="adsbygoogle block"
         style={{ display: "block" }}

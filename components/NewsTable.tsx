@@ -36,7 +36,10 @@ export default function NewsTable({ items }: { items: NewsItem[] }) {
     return (
       <section className="glass-card section-card p-4">
         <div className="section-title">Latest news</div>
-        <p className="text-slate-500 text-sm">No news data.</p>
+        <p className="text-sm leading-7 text-slate-400">
+          No recent company headlines were returned for this symbol. In this case, the dashboard leans more heavily on
+          price history and volatility than on news sentiment.
+        </p>
       </section>
     );
   }

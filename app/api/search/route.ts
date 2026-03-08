@@ -16,7 +16,11 @@ function evictExpired() {
   if (cache.size > MAX_CACHE_SIZE) {
     const excess = cache.size - MAX_CACHE_SIZE;
     const keys = cache.keys();
-    for (let i = 0; i < excess; i++) keys.next().value && cache.delete(keys.next().value!);
+    for (let i = 0; i < excess; i++) {
+      const nextKey = keys.next().value;
+      if (!nextKey) break;
+      cache.delete(nextKey);
+    }
   }
 }
 

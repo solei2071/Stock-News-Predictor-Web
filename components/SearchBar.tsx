@@ -111,6 +111,10 @@ export default function SearchBar({ onSubmit, loading }: SearchBarProps) {
   return (
     <form onSubmit={handleSubmit} className="glass-card form-card p-5 fade-in">
       <div className="section-title">Analysis settings</div>
+      <p className="mb-4 max-w-3xl text-sm leading-7 text-slate-400">
+        Enter a listed company name or ticker to generate a fresh research snapshot. The resulting page explains the
+        trend signal, recent news tone, confidence, and forecast range for educational use.
+      </p>
       <div className="flex flex-wrap items-end gap-3">
         <div
           className="flex flex-col gap-1 relative w-full md:flex-[1_1_24rem]"

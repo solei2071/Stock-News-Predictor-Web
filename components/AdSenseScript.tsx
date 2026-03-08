@@ -1,5 +1,9 @@
 export default function AdSenseScript() {
-  const clientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-7431749331315224";
+  const clientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+
+  if (!clientId || !/^ca-pub-\d{10,}$/.test(clientId)) {
+    return null;
+  }
 
   return (
     <script

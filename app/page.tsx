@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
 import MetricCards from "@/components/MetricCards";
 import PriceChart from "@/components/PriceChart";
 import NewsTable from "@/components/NewsTable";
 import AdSenseUnit from "@/components/AdSenseUnit";
-import SiteFooter from "@/components/SiteFooter";
+import HomeContentSections from "@/components/HomeContentSections";
+import AnalysisBrief from "@/components/AnalysisBrief";
 
 interface AnalysisData {
   symbol: string;
@@ -108,22 +110,37 @@ export default function Home() {
     }
   };
 
+  const adSlot =
+    process.env.NEXT_PUBLIC_ADSENSE_SLOT_CONTENT || process.env.NEXT_PUBLIC_ADSENSE_SLOT_BOT;
+
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8 md:py-10 space-y-6">
+    <main className="mx-auto max-w-7xl space-y-6 px-4 py-8 md:py-10">
       <div className="hero-shell">
         <header className="hero-card p-6 lg:p-8">
           <p className="hero-kicker">Market Intelligence</p>
-          <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <h1 className="hero-title">Market Pulse</h1>
               <p className="mt-2 max-w-2xl hero-copy">
-                Stock signal dashboard with price forecasting and sentiment analysis across multiple data sources.
+                Educational stock research that blends recent price direction, headline sentiment, and volatility-aware
+                ranges into an explainable daily briefing.
               </p>
+              <div className="mt-5 flex flex-wrap gap-3 text-sm">
+                <Link
+                  href="/methodology"
+                  className="rounded-full border border-cyan-500/40 px-4 py-2 text-cyan-200 transition hover:bg-cyan-500/10 hover:text-white"
+                >
+                  Review methodology
+                </Link>
+                <Link
+                  href="/about"
+                  className="rounded-full border border-slate-700 px-4 py-2 text-slate-300 transition hover:border-slate-500 hover:text-white"
+                >
+                  Why this site exists
+                </Link>
+              </div>
             </div>
-            <div
-              className={`status-chip ${statusClass(status)} transition`}
-              role="status"
-            >
+            <div className={`status-chip ${statusClass(status)} transition`} role="status">
               {status}
             </div>
           </div>
@@ -134,16 +151,36 @@ export default function Home() {
 
       {error && <div className="alert-error">{error}</div>}
 
-      <section>
-        <AdSenseUnit slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP} className="ad-shell" />
-      </section>
+      <HomeContentSections />
 
-      {loading ? (
-        <LoadingSkeleton />
-      ) : (
-        <>
-          <MetricCards data={data} />
-          {data && (
+      <section className="space-y-4">
+        <div className="glass-card p-6 lg:p-7">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="section-title">Live analysis workspace</p>
+              <h2 className="font-['Sora'] text-2xl font-semibold tracking-[-0.02em] text-slate-100">
+                Run a fresh read on a supported stock
+              </h2>
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">
+                Each run generates a new dashboard from the selected price history, recent company headlines, and a
+                volatility-derived forecast band. The analysis is meant to be read alongside the chart and linked news,
+                not in isolation.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-slate-800/70 bg-slate-950/25 px-4 py-3 text-sm text-slate-400">
+              Try symbols like <span className="text-slate-200">AAPL</span>, <span className="text-slate-200">MSFT</span>,
+              {" "}
+              <span className="text-slate-200">TSLA</span>, or <span className="text-slate-200">NVDA</span>.
+            </div>
+          </div>
+        </div>
+
+        {loading ? (
+          <LoadingSkeleton />
+        ) : data ? (
+          <>
+            <MetricCards data={data} />
+            <AnalysisBrief data={data} />
             <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
               <PriceChart
                 candles={data.candles}
@@ -155,14 +192,17 @@ export default function Home() {
               />
               <NewsTable items={data.newsItems} />
             </div>
-          )}
-        </>
-      )}
-
-      <section>
-        <AdSenseUnit slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BOT} className="ad-shell" />
+            <AdSenseUnit
+              slot={adSlot}
+              className="ad-shell"
+              enabled={Boolean(data)}
+              label="Advertisement"
+            />
+          </>
+        ) : (
+          <MetricCards data={data} />
+        )}
       </section>
-      <SiteFooter />
     </main>
   );
 }

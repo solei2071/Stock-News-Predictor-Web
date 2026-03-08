@@ -28,16 +28,18 @@ function Card({
   value,
   sub,
   accent,
+  valueClassName,
 }: {
   title: string;
   value: string;
   sub: string;
   accent?: string;
+  valueClassName?: string;
 }) {
   return (
     <div className="card-stat p-4 min-w-0">
       <p className="card-title">{title}</p>
-      <p className={`stat-value truncate ${accent || "text-slate-100"}`}>{value}</p>
+      <p className={`stat-value truncate ${accent || "text-slate-100"} ${valueClassName || ""}`}>{value}</p>
       <p className="text-xs text-slate-300 mt-1 leading-relaxed">{sub}</p>
     </div>
   );
@@ -45,10 +47,56 @@ function Card({
 
 export default function MetricCards({ data }: { data: AnalysisResult | null }) {
   if (!data) {
+    const overviewCards = [
+      {
+        title: "Current Price",
+        value: "Live quote",
+        sub: "Shows the latest price, exchange, and selected market snapshot after you search.",
+        accent: "text-cyan-200",
+      },
+      {
+        title: "Price Trend",
+        value: "Trend model",
+        sub: "Extends the recent direction from the chosen lookback window into your forecast horizon.",
+        accent: "text-emerald-300",
+      },
+      {
+        title: "News Sentiment",
+        value: "Headline tone",
+        sub: "Scores the latest company headlines so readers can see whether coverage is supportive or weak.",
+        accent: "text-sky-300",
+      },
+      {
+        title: "Projected Return",
+        value: "Combined view",
+        sub: "Blends the price trend and news read into an educational directional signal.",
+        accent: "text-violet-300",
+      },
+      {
+        title: "Confidence",
+        value: "Context score",
+        sub: "Weights price history depth, news volume, and observed volatility before showing certainty.",
+        accent: "text-amber-300",
+      },
+      {
+        title: "Forecast Range",
+        value: "Risk band",
+        sub: "Displays a range so you can compare expected movement with likely uncertainty.",
+        accent: "text-indigo-300",
+      },
+    ];
+
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-        {["Current Price", "Price Trend", "News Sentiment", "Projected Return", "Confidence", "Forecast Range"].map((t) => (
-          <Card key={t} title={t} value="-" sub="-" />
+        {overviewCards.map((card) => (
+          <Card
+            key={card.title}
+            title={card.title}
+            value={card.value}
+            sub={card.sub}
+            accent={card.accent}
+            valueClassName="text-[clamp(1rem,1.5vw,1.5rem)]"
+          />
         ))}
       </div>
     );
